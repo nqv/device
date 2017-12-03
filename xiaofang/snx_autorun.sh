@@ -1,13 +1,14 @@
 #!/bin/sh
-# WiFi
-SID=""
-PSK=""
-# Status file
-STA=""
-# Backup directory
-BAK=""
 
-# setssid [SSID] [PASSWORD]
+# For autorun:
+SSID=''
+# Use quoted "passphrase" string or result from wpa_passphrase without double quotes
+PSK='""'
+STATUS_FILE=''
+SNAPSHOT_DIR=''
+START_TELNETD=1
+
+# setssid <SSID> <PASSWORD>
 setssid() {
 	cat > /tmp/wpa_supplicant.conf <<__EOF__
 ctrl_interface=/var/run/wpa_supplicant
@@ -16,12 +17,9 @@ ap_scan=1
 
 network={
 	ssid="$1"
-	psk="$2"
+	psk=$2
 	key_mgmt=WPA-PSK
-	pairwise=CCMP TKIP
-	group=CCMP TKIP WEP104 WEP40
-	scan_ssid="1"
-	priority=2
+	scan_ssid=1
 }
 __EOF__
 }
@@ -77,70 +75,68 @@ snapshot() {
 	nvram_get -f NetRelated_MAC NetRelated_MAC.nvr
 }
 
-printstatus() {
+status() {
+	set -x
 	date
-	echo '# uname'
 	uname -a
-	echo '# cat /proc/cpuinfo'
 	cat /proc/cpuinfo
-	echo '# cat /proc/meminfo'
 	cat /proc/meminfo
-	echo '# cat /proc/version'
 	cat /proc/version
-	echo '# ps'
 	ps
-	echo '# mount'
 	mount
-	echo '# ifconfig'
 	ifconfig
-	echo '# lsmod'
 	lsmod
-	echo '# ls'
 	ls -lR /bin /dev /etc /lib /mnt /root /sbin /tmp /usr /var
+	set +x
 }
 
 # tz <TZ>
 # e.g. tz "AEST-10"
-settz() {
+tz() {
 	echo "$1" > /etc/TZ
 	ntpd -q -n -p time.google.com
 }
 
-case "$1" in
-	"snapshot")
-		snapshot "$2"
-		;;
-	"ssid")
-		setssid "$2" "$3"
+stopvendor() {
+        killall -9 test_UP iCamera
+        for i in 1 2 3; do
+                sleep 1
+                if lsmod | grep snx_wdt; then
+                        modprobe -r snx_wdt
+                else
+                        break
+                fi
+        done
+}
+
+# autorun [PREFIX]
+autorun() {
+	if [ -n "$SSID" ]; then
+		setssid "$SSID" "$PSK"
 		startwpa
 		startudhcpc
-		;;
-	"status")
-		printstatus
-		;;
-	"tz")
-		settz "$2"
-		;;
-	"-h")
-		echo "$0 <COMMAND>"
-		exit 2
+	fi
+	if [ -n "$STATUS_FILE" ]; then
+		status >> "$1/$STATUS_FILE" 2>&1
+	fi
+	if [ -n "$SNAPSHOT_DIR" ]; then
+		snapshot "$1/$SNAPSHOT_DIR"
+	fi
+	if [ "$START_TELNETD" = "1" ]; then
+		starttelnetd
+	fi
+}
+
+case "$1" in
+	"")
+		# autorun - requires $MDEV (e.g. "mmcblk0p1")
+		if [ -n "$MDEV" ]; then
+			autorun "/media/$MDEV"
+		fi
 		;;
 	*)
-		# autorun - requires $MDEV (e.g. "mmcblk0p1")
-		if [ -z "$MDEV" ]; then
-			exit 1
-		fi
-		if [ ! -z "$SID" ]; then
-			setssid "$SID" "$PSK"
-			startwpa
-			startudhcpc
-		fi
-		if [ ! -z "$STA" ]; then
-			printstatus >> "/media/$MDEV/$STA"
-		fi
-		if [ ! -z "$BAK" ]; then
-			backup "/media/$MDEV/$BAK"
-		fi
-		starttelnetd
+		CMD="$1"
+		shift
+		"$CMD" "$@"
 		;;
 esac
