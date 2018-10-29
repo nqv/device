@@ -1,4 +1,4 @@
-# Xiaofang Square Camera
+# iSC5 Camera
 
 ## Bootstrap
 
