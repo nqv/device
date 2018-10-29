@@ -1,0 +1,14 @@
+#!/bin/sh
+case "$1" in
+start)
+	if ! pidof ir_ctl.sh > /dev/null; then
+		ir_ctl.sh > /dev/null &
+	fi
+	;;
+stop)
+	killall ir_ctl.sh
+	;;
+status)
+	pidof ir_ctl.sh
+	;;
+esac

@@ -1,0 +1,14 @@
+#!/bin/sh
+case "$1" in
+start)
+	if ! pidof ftpd > /dev/null; then
+		ftpd -D
+	fi
+	;;
+stop)
+	killall ftpd
+	;;
+status)
+	pidof ftpd
+	;;
+esac

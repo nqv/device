@@ -1,0 +1,23 @@
+--- a/main.cpp	2016-06-06 11:55:10.000000000 +1000
++++ b/main.cpp	2019-12-01 09:30:33.179640419 +1000
+@@ -45,7 +45,7 @@
+ 
+ #define AV_CAP_MODE					(0)
+ #define AV_PLAY_MODE				(1)
+-#define ALEK_ADD_MULTI    1
++#define ALEK_ADD_MULTI    0
+ 
+ // create live555 environment
+ UsageEnvironment* env = NULL;
+@@ -448,9 +448,9 @@
+ 	int c = 0;     
+ 	//while ((c = getopt (argc, argv, "hW:H:Q:P:F:v::O:T:m:u:rsM:")) != -1)
+ #if AUDIO_STREAM
+-	while ((c = getopt (argc, argv, "hb:B:wW:rH:gG:p:P:f:i:O:T:m:u:U:M:aj:J:cs:S:Q:F:l:k:e:z:y:p:v:")) != -1)
++	while ((c = getopt (argc, argv, "hb:B:w:W:r:H:g:G:p:P:f:i:O:T:m:u:U:M:aj:J:cs:S:Q:F:l:k:e:z:y:p:v:")) != -1)
+ #else
+-	while ((c = getopt (argc, argv, "hb:B:wW:rH:gG:p:P:f:i:O:T:m:u:U:M:j:J:cs:S:Q:F:l:k:e:z:y:p:v:")) != -1)
++	while ((c = getopt (argc, argv, "hb:B:w:W:r:H:g:G:p:P:f:i:O:T:m:u:U:M:j:J:cs:S:Q:F:l:k:e:z:y:p:v:")) != -1)
+ #endif
+ 	{
+ 		switch (c)

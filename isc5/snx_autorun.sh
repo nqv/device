@@ -7,6 +7,7 @@ PSK='""'
 STATUS_FILE=''
 SNAPSHOT_DIR=''
 START_TELNETD=1
+START_SERVICES=0 # Requires start.sh
 
 # setssid <SSID> <PASSWORD>
 setssid() {
@@ -98,15 +99,15 @@ tz() {
 }
 
 stopvendor() {
-        killall -9 test_UP iCamera
-        for i in 1 2 3; do
-                sleep 1
-                if lsmod | grep snx_wdt; then
-                        modprobe -r snx_wdt
-                else
-                        break
-                fi
-        done
+	killall -9 test_UP iCamera
+	for i in 1 2 3; do
+		sleep 1
+		if lsmod | grep snx_wdt; then
+			modprobe -r snx_wdt
+		else
+			break
+		fi
+	done
 }
 
 # autorun [PREFIX]
@@ -125,18 +126,21 @@ autorun() {
 	if [ "$START_TELNETD" = "1" ]; then
 		starttelnetd
 	fi
+	if [ "$START_SERVICES" = "1" ]; then
+		"$1/start.sh"
+	fi
 }
 
 case "$1" in
-	"")
-		# autorun - requires $MDEV (e.g. "mmcblk0p1")
-		if [ -n "$MDEV" ]; then
-			autorun "/media/$MDEV"
-		fi
-		;;
-	*)
-		CMD="$1"
-		shift
-		"$CMD" "$@"
-		;;
+"")
+	# autorun - requires $MDEV (e.g. "mmcblk0p1")
+	if [ -n "$MDEV" ]; then
+		autorun "/media/$MDEV"
+	fi
+	;;
+*)
+	CMD="$1"
+	shift
+	"$CMD" "$@"
+	;;
 esac

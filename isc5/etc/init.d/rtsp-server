@@ -1,0 +1,14 @@
+#!/bin/sh
+case "$1" in
+start)
+	if ! pidof snx_rtsp_server > /dev/null; then
+		snx_rtsp_server -w 1920 -r 1080 -Q 25 > /dev/null &
+	fi
+	;;
+stop)
+	killall snx_rtsp_server
+	;;
+status)
+	pidof snx_rtsp_server
+	;;
+esac
