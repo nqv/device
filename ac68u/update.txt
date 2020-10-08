@@ -1,0 +1,6 @@
+set -x
+wget -nH http://192.168.29.5:8080/update.zip
+unzip -o update.zip
+chmod 755 mtd-write
+./mtd-write new_cfe.bin boot
+mtd-write2 FW_RT_AC68U_30043763626.trx linux
