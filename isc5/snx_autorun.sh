@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # For autorun:
-SSID=''
+SSID='' # Set WiFi
 # Use quoted "passphrase" string or result from wpa_passphrase without double quotes
 PSK='""'
-STATUS_FILE=''
-SNAPSHOT_DIR=''
-START_TELNETD=1
-START_SERVICES=0 # Requires start.sh
+STATUS_FILE='' # Export system status
+SNAPSHOT_DIR='' # Export MTD snapshot
+START_TELNETD=1 # Run telnetd
+START_SERVICES=0 # Run services in ./etc/init.d
 
 # setssid <SSID> <PASSWORD>
 setssid() {
@@ -45,7 +45,7 @@ startudhcpc() {
 	fi
 }
 
-# snapshot [DEST]
+# snapshot [DIR]
 snapshot() {
 	if [ ! -z "$1" ]; then
 		mkdir -p "$1"
@@ -92,7 +92,7 @@ status() {
 }
 
 # tz <TZ>
-# e.g. tz "AEST-10"
+# ./snx_autorun.sh tz "AEST-10"
 tz() {
 	echo "$1" > /etc/TZ
 	ntpd -q -n -p time.google.com
@@ -110,7 +110,31 @@ stopvendor() {
 	done
 }
 
-# autorun [PREFIX]
+enablevendor() {
+	sed -i 's|^#modprobe snx_wdt|modprobe snx_wdt|' /etc/init.d/rcS
+	sed -i 's|^#/usr/bin/iSC3S/iSC3S|/usr/bin/iSC3S/iSC3S|' /etc/init.d/rcS
+}
+
+disablevendor() {
+	sed -i 's|^modprobe snx_wdt|#modprobe snx_wdt|' /etc/init.d/rcS
+	sed -i 's|^/usr/bin/iSC3S/iSC3S|#/usr/bin/iSC3S/iSC3S|' /etc/init.d/rcS
+}
+
+# startservices <DIR>
+# ./snx_autorun.sh startservices /media/mmcblk0p1
+startservices() {
+	if [ -n "$1" ]; then
+		export PATH="$PATH:$1/bin"
+		export LD_LIBRARY_PATH="$1/bin"
+		for f in "$1"/etc/init.d/*; do
+			if [ -x "$f" ]; then
+				"$f" start
+			fi
+		done
+	fi
+}
+
+# autorun [DIR]
 autorun() {
 	if [ -n "$SSID" ]; then
 		setssid "$SSID" "$PSK"
@@ -127,7 +151,7 @@ autorun() {
 		starttelnetd
 	fi
 	if [ "$START_SERVICES" = "1" ]; then
-		"$1/start.sh"
+		(startservices "$1")
 	fi
 }
 

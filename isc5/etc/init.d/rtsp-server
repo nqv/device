@@ -2,7 +2,7 @@
 case "$1" in
 start)
 	if ! pidof snx_rtsp_server > /dev/null; then
-		snx_rtsp_server -w 1920 -r 1080 -Q 25 > /dev/null &
+		snx_rtsp_server -w 1920 -r 1080 -Q 25 > /dev/null 2>&1 &
 	fi
 	;;
 stop)

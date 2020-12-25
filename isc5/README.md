@@ -52,6 +52,11 @@ To remove vendor apps, edit /etc/init.d/rcS and comment out:
 #modprobe snx_wdt
 #/usr/bin/iSC3S/iSC3S
 ```
+or run
+```
+./snx_autorun.sh stopvendor
+./snx_autorun.sh disablevendor
+```
 
 ## Development
 Unpack SDK:
@@ -97,8 +102,8 @@ make
 LD_LIBRARY_PATH=/media/mmcblk0p1/bin ./snx_rtsp_server -w 1920 -r 1080
 
 # Play
-rtsp://<IP>/media/stream1
+ffplay rtsp://<IP>/media/stream1
 ```
 
 ### Start all services on sdcard
-Copy `start.sh`, `bin` and `etc` folders to sdcard and set `START_SERVICES=1` in `snx_autorun.sh`
+Copy `bin` and `etc` folders to sdcard and set `START_SERVICES=1` in `snx_autorun.sh`
