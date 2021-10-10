@@ -1,0 +1,34 @@
+{
+	"items": [{
+		"name": "File server",
+		"items": [{
+			"name": "Start WebDAV",
+			"exitmenu": false,
+			"checked": true,
+			"refresh": false,
+			"action": "./start.sh",
+			"params": "webdav"
+		}, {
+			"name": "Stop WebDAV",
+			"exitmenu": false,
+			"checked": true,
+			"refresh": false,
+			"action": "./stop.sh",
+			"params": "webdav"
+		}, {
+			"name": "Start FileBrowser",
+			"exitmenu": false,
+			"checked": true,
+			"refresh": false,
+			"action": "./start.sh",
+			"params": "filebrowser"
+		}, {
+			"name": "Stop FileBrowser",
+			"exitmenu": false,
+			"checked": true,
+			"refresh": false,
+			"action": "./stop.sh",
+			"params": "filebrowser"
+		}]
+	}]
+}
